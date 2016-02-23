@@ -1,5 +1,6 @@
 package com.mslavik.speedygrader;
 
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -45,20 +46,26 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 
 	private File javaFilesLoc;
 	private String inputText;
+	
+	private Font textFont;
 
 	public SpeedyGrader() {
 		super("SpeedyGrader");
 
 		this.setSize(1000, 500);
+		
+		textFont = new Font("Consolas", 0, 16);
 
 		menuBar = new JMenuBar();
 
 		openButton = new JButton("Open Folder");
 		openButton.setToolTipText("The folder that contains the .java files.");
 		openButton.addActionListener(this);
+		openButton.setFont(textFont);
 
 		inputButton = new JButton("Select Input File");
 		inputButton.addActionListener(this);
+		inputButton.setFont(textFont);
 
 		menuBar.add(openButton);
 		menuBar.add(inputButton);
@@ -71,6 +78,7 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 		filesList.setLayoutOrientation(JList.VERTICAL);
 		filesList.setVisibleRowCount(-1);
 		filesList.addListSelectionListener(this);
+		filesList.setFont(textFont);
 
 		filesListModel = new DefaultListModel<String>();
 
@@ -82,8 +90,11 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 		editorTextArea.setEditable(false);
 		editorTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
 		editorTextArea.setCodeFoldingEnabled(true);
+		editorTextArea.setFont(textFont);
+		editorTextArea.setTabSize(4);
 		consoleTextArea = new JTextArea();
 		consoleTextArea.setEditable(false);
+		consoleTextArea.setFont(textFont);
 
 		splitEditorPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		splitEditorPane.add(new RTextScrollPane(editorTextArea));
