@@ -119,7 +119,8 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 		splitMainPane.add(new JScrollPane(filesList));
 		splitMainPane.add(splitEditorPane);
 		splitMainPane.setDividerLocation(.2);
-
+		
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);
 		this.add(splitMainPane);
 		this.setVisible(true);
