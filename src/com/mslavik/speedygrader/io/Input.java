@@ -1,4 +1,4 @@
-package com.mslavik.speedygrader;
+package com.mslavik.speedygrader.io;
 
 import java.io.BufferedReader;
 import java.io.File;

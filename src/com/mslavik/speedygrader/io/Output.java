@@ -1,4 +1,4 @@
-package com.mslavik.speedygrader;
+package com.mslavik.speedygrader.io;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 

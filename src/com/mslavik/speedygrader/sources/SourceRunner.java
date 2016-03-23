@@ -1,4 +1,4 @@
-package com.mslavik.speedygrader;
+package com.mslavik.speedygrader.sources;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -9,7 +9,8 @@ import java.io.OutputStreamWriter;
 import java.io.SequenceInputStream;
 import java.util.concurrent.TimeUnit;
 
-import com.mslavik.speedygrader.sources.SourceFile;
+import com.mslavik.speedygrader.SpeedyGrader;
+import com.mslavik.speedygrader.io.Output;
 
 public class SourceRunner implements Runnable {
 

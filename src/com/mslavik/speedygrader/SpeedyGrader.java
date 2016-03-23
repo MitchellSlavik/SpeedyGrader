@@ -33,9 +33,12 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
+import com.mslavik.speedygrader.io.Input;
+import com.mslavik.speedygrader.io.Output;
 import com.mslavik.speedygrader.sources.CppFile;
 import com.mslavik.speedygrader.sources.JavaFile;
 import com.mslavik.speedygrader.sources.SourceFile;
+import com.mslavik.speedygrader.sources.SourceRunner;
 import com.mslavik.speedygrader.sources.SourceType;
 
 @SuppressWarnings("serial")
