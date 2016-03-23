@@ -66,7 +66,7 @@ public class JavaFile extends SourceFile {
 			String line = in.readLine();
 			while (line != null) {
 
-				if (line.contains("class")) {
+				if (line.contains("class") && !line.contains("import")) {
 					int classIndex = line.indexOf("class");
 					ret = line.substring(classIndex + 6, line.indexOf(" ", classIndex + 6));
 					break;
