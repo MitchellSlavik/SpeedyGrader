@@ -3,29 +3,29 @@ package com.mslavik.speedygrader;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
+import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.SequenceInputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
+import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
-import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -33,60 +33,82 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
+import com.mslavik.speedygrader.sources.CppFile;
+import com.mslavik.speedygrader.sources.JavaFile;
+import com.mslavik.speedygrader.sources.SourceFile;
+import com.mslavik.speedygrader.sources.SourceType;
+
 @SuppressWarnings("serial")
 public class SpeedyGrader extends JFrame implements ActionListener, ListSelectionListener {
 
 	private JMenuBar menuBar;
-	private JButton openButton;
-	private JButton inputButton;
-	private JButton saveButton;
-	private JList<String> filesList;
-	private DefaultListModel<String> filesListModel;
+	private JMenuItem openItem, inputItem, saveItem;
+	private JList<SourceFile> filesList;
+	private DefaultListModel<SourceFile> filesListModel;
 	private JSplitPane splitMainPane;
 	private JSplitPane splitEditorPane;
 	private RSyntaxTextArea editorTextArea;
 	private JTextArea consoleTextArea;
+	private String editorText = "";
+	private SourceFile currentSourceFile;
 
-	private File javaFilesLoc;
+	private File filesLoc;
 	private Input input;
-	
+
 	private Font textFont;
-	
+
 	private ExecutorService exe;
+	private ArrayList<Future<?>> futures = new ArrayList<Future<?>>();
 
 	public SpeedyGrader() {
 		super("SpeedyGrader");
 
 		this.setSize(1000, 500);
 		
+		BufferedImage icon = null;
+		try {
+			icon = ImageIO.read(new File( "lib"+File.separator+"speedygrader-icon.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		this.setIconImage(icon);
+
 		input = new Input();
-		
+
 		exe = Executors.newCachedThreadPool();
-		
+
 		textFont = new Font("Consolas", 0, 16);
 
 		menuBar = new JMenuBar();
-
-		openButton = new JButton("Open Folder");
-		openButton.setToolTipText("The folder that contains the .java files.");
-		openButton.addActionListener(this);
-		openButton.setFont(textFont);
-
-		inputButton = new JButton("Select Input File");
-		inputButton.addActionListener(this);
-		inputButton.setFont(textFont);
 		
-		saveButton = new JButton("Save and Run");
-		saveButton.addActionListener(this);
-		saveButton.setFont(textFont);
+		JMenu fileMenu = new JMenu("  File  ");
+		fileMenu.setMnemonic(KeyEvent.VK_F);
 
-		menuBar.add(openButton);
-		menuBar.add(inputButton);
-		menuBar.add(saveButton);
+		openItem = new JMenuItem("Select Folder");
+		openItem.setToolTipText("The folder that contains the source files.");
+		openItem.addActionListener(this);
+		openItem.setFont(textFont);
+		openItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+
+		inputItem = new JMenuItem("Select Input File");
+		inputItem.addActionListener(this);
+		inputItem.setFont(textFont);
+
+		saveItem = new JMenuItem("Save and Run");
+		saveItem.addActionListener(this);
+		saveItem.setFont(textFont);
+		saveItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+
+		fileMenu.add(openItem);
+		fileMenu.add(inputItem);
+		fileMenu.add(saveItem);
+		
+		menuBar.add(fileMenu);
 
 		this.setJMenuBar(menuBar);
 
-		filesList = new JList<String>();
+		filesList = new JList<SourceFile>();
 
 		filesList.setSelectionMode(JList.VERTICAL);
 		filesList.setLayoutOrientation(JList.VERTICAL);
@@ -94,15 +116,12 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 		filesList.addListSelectionListener(this);
 		filesList.setFont(textFont);
 
-		filesListModel = new DefaultListModel<String>();
-
-		filesListModel.addElement("");
+		filesListModel = new DefaultListModel<SourceFile>();
 
 		filesList.setModel(filesListModel);
 
 		editorTextArea = new RSyntaxTextArea();
 		editorTextArea.setEditable(true);
-		editorTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
 		editorTextArea.setCodeFoldingEnabled(true);
 		editorTextArea.setFont(textFont);
 		editorTextArea.setTabSize(4);
@@ -119,7 +138,7 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 		splitMainPane.add(new JScrollPane(filesList));
 		splitMainPane.add(splitEditorPane);
 		splitMainPane.setDividerLocation(.2);
-		
+
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);
 		this.add(splitMainPane);
@@ -128,47 +147,61 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 
 	@Override
 	public void actionPerformed(ActionEvent ae) {
-		if (ae.getSource().equals(openButton)) {
+		if (ae.getSource().equals(openItem)) {
 			JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.home")));
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			int ret = chooser.showOpenDialog(this);
 			if (ret == JFileChooser.APPROVE_OPTION) {
-				javaFilesLoc = chooser.getSelectedFile();
+				filesLoc = chooser.getSelectedFile();
 				newFolderSelected();
 			}
-		} else if (ae.getSource().equals(inputButton)) {
+		} else if (ae.getSource().equals(inputItem)) {
 			JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.home")));
 			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			int ret = chooser.showOpenDialog(this);
 			if (ret == JFileChooser.APPROVE_OPTION) {
 				input.parseFile(chooser.getSelectedFile());
 			}
-		} else if (ae.getSource().equals(saveButton)){
-			File file = new File(javaFilesLoc, filesList.getSelectedValue()+".java");
-			try {
-				PrintWriter pw = new PrintWriter(file);
-				pw.append(editorTextArea.getText());
-				pw.flush();
-				pw.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
+		} else if (ae.getSource().equals(saveItem)) {
+			filesList.getSelectedValue().save(editorTextArea.getText());
+			editorText = editorTextArea.getText();
 			startComplieAndRun();
 		}
 	}
 
 	public void newFolderSelected() {
+		SourceFile.setFolders(filesLoc);
+		editorTextArea.setText("");
+		consoleTextArea.setText("");
 		filesListModel.clear();
-		for (File f : javaFilesLoc.listFiles(new FileFilter() {
+		currentSourceFile = null;
+		for (File f : filesLoc.listFiles(new FileFilter() {
 			@Override
 			public boolean accept(File f) {
-				if (f.isFile() && f.getName().endsWith(".java")) {
-					return true;
+				if (f.isFile()){
+					return SourceType.getSourceType(f) != null;
 				}
 				return false;
 			}
 		})) {
-			filesListModel.addElement(f.getName().substring(0, f.getName().length() - 5));
+			SourceType st = SourceType.getSourceType(f);
+
+			if (st != null) {
+				SourceFile sf = null;
+
+				switch (st) {
+				case CPP:
+					sf = new CppFile(f);
+					break;
+				case JAVA:
+					sf = new JavaFile(f);
+					break;
+				}
+				
+				if (sf != null) {
+					filesListModel.addElement(sf);
+				}
+			}
 		}
 		splitMainPane.setDividerLocation(.2);
 		this.revalidate();
@@ -178,92 +211,66 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 	@Override
 	public void valueChanged(ListSelectionEvent lse) {
 		if (!lse.getValueIsAdjusting()) {
-			String name = filesList.getSelectedValue();
-			editorTextArea.setText("");
-			try {
-				BufferedReader in = new BufferedReader(new FileReader(new File(javaFilesLoc, name + ".java")));
-				String line = in.readLine();
-				while (line != null) {
-					editorTextArea.append(line + "\n");
-					line = in.readLine();
+			if(!editorTextArea.getText().equals(editorText) && currentSourceFile != null){
+				int i = JOptionPane.showConfirmDialog(this, "Would you like to save before switching files?", "Save?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+				switch(i){
+				case JOptionPane.YES_OPTION:
+					currentSourceFile.save(editorTextArea.getText());
+					break;
+				case JOptionPane.NO_OPTION:
+					break;
+				case JOptionPane.CANCEL_OPTION:
+				case JOptionPane.CLOSED_OPTION:
+					return;
 				}
-				in.close();
-			} catch (Exception e) {
+			}
+			
+			SourceFile sf = filesList.getSelectedValue();
+			editorTextArea.setText(sf.getFileText());
+			editorText = editorTextArea.getText();
+			currentSourceFile = sf;
+			switch(sf.getSourceType()){
+			case CPP:
+				editorTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_CPLUSPLUS);
+				break;
+			case JAVA:
+				editorTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
+				break;
+			}
+			
+			if(splitEditorPane.getDividerLocation() == 0){
+				splitEditorPane.setDividerLocation(.5);
 			}
 			startComplieAndRun();
 		}
-
 	}
 
 	public void startComplieAndRun() {
-		String name = filesList.getSelectedValue();
+		//New file to compile and run, cancel the old one.
+		for(Future<?> future : futures){
+			if(!future.isDone()){
+				future.cancel(true);
+			}
+		}
+		futures.clear();
+		
+		//Start the new compile
+		SourceFile sf = filesList.getSelectedValue();
 		consoleTextArea.setText("");
 
-		final File binFolder = new File(javaFilesLoc, "bin\\");
-		File sourcesFolder = new File(javaFilesLoc, "src\\");
-		binFolder.mkdirs();
-		sourcesFolder.mkdirs();
-		try {
-			File f = new File(javaFilesLoc, name+".java");
-			File file;
-			String className = getClassName(f);
-			
-			if(!className.equalsIgnoreCase(name)){
-				file = new File(sourcesFolder, className+".java");
-				file.createNewFile();
-				name = className;
-				Files.copy(f.toPath(), file.toPath() , StandardCopyOption.REPLACE_EXISTING);
-			}else{
-				file = f;
-			}
-			
-			Process pro1 = Runtime.getRuntime().exec("javac -d \"" + binFolder.getAbsolutePath() + "\" \"" + file.getAbsolutePath()+"\"");
-			pro1.waitFor();
+		String compileErrors = sf.compile();
 
-			BufferedReader in = new BufferedReader(new InputStreamReader(new SequenceInputStream(pro1.getInputStream(), pro1.getErrorStream())));
-			String line = null;
-			String complieErrors = "";
-			while ((line = in.readLine()) != null) {
-				complieErrors += line + "\n";
+		if (compileErrors.length() != 0) {
+			consoleTextArea.append("Compile Errors:\n" + compileErrors);
+		} else {
+			//Run the inputs if we complied successfully
+			Output output = new Output(consoleTextArea, input.size());
+			for (int i = 0; i < input.size(); i++) {
+				futures.add(exe.submit(new SourceRunner(this, output, i, sf)));
 			}
-			if(complieErrors.length() != 0){
-				consoleTextArea.append("Compile Errors:\n"+complieErrors);
-			}else{
-				Output output = new Output(consoleTextArea, input.size());
-				for(int i = 0; i < input.size(); i++){
-					exe.execute(new JavaRunner(this, output, i, name, binFolder.getAbsolutePath()));
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
+	}
 
-	}
-	
-	public String getClassName(File f){
-		String ret = "";
-		try {
-			BufferedReader in = new BufferedReader(new FileReader(f));
-			String line = in.readLine();
-			while (line != null) {
-				
-				if(line.contains("class")){
-					int classIndex = line.indexOf("class");
-					ret = line.substring(classIndex+6, line.indexOf(" ", classIndex+6));
-					break;
-				}
-				
-				line = in.readLine();
-			}
-			in.close();
-		} catch (Exception e) {
-		}
-		
-		return ret;
-	}
-	
 	public Input getInput() {
 		return input;
 	}
