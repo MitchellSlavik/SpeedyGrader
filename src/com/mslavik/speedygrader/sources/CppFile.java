@@ -17,7 +17,7 @@ public class CppFile extends SourceFile {
 	@Override
 	public String compile() {
 		String compileErrors = "";
-		ProcessBuilder pb = new ProcessBuilder("g++", "\""+fileLoc.getAbsolutePath()+"\"", "-o", "\"" + binFolder.getAbsolutePath() + File.separator + className + ".exe");
+		ProcessBuilder pb = new ProcessBuilder("g++", "\""+fileLoc.getAbsolutePath()+"\"", "-o", "\"" + binFolder.getAbsolutePath() + File.separator + className + ".exe\"");
 		try {
 			Process p = pb.start();
 			p.waitFor();
