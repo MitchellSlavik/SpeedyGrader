@@ -57,6 +57,7 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 
 	private File filesLoc;
 	private Input input;
+	private Output output;
 
 	private Font textFont;
 
@@ -94,9 +95,10 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 		openItem.setFont(textFont);
 		openItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
 
-		inputItem = new JMenuItem("Select Input File");
+		inputItem = new JMenuItem("Set Input");
 		inputItem.addActionListener(this);
 		inputItem.setFont(textFont);
+		inputItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, ActionEvent.CTRL_MASK));
 
 		saveItem = new JMenuItem("Save and Run");
 		saveItem.addActionListener(this);
@@ -245,6 +247,9 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 
 	public void startComplieAndRun() {
 		//New file to compile and run, cancel the old one.
+		if(output != null){
+			output.cancel();
+		}
 		for(Future<?> future : futures){
 			if(!future.isDone()){
 				future.cancel(true);
@@ -255,16 +260,19 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 		//Start the new compile
 		SourceFile sf = filesList.getSelectedValue();
 		consoleTextArea.setText("");
-
-		String compileErrors = sf.compile();
-
-		if (compileErrors.length() != 0) {
-			consoleTextArea.append("Compile Errors:\n" + compileErrors);
-		} else {
-			//Run the inputs if we complied successfully
-			Output output = new Output(consoleTextArea, input.size());
-			for (int i = 0; i < input.size(); i++) {
-				futures.add(exe.submit(new SourceRunner(this, output, i, sf)));
+		
+		if(sf != null){
+			String compileErrors = sf.compile();
+	
+			if (compileErrors.length() != 0) {
+				consoleTextArea.append("Compile Errors:\n" + compileErrors);
+			} else {
+				
+				//Run the inputs if we complied successfully
+				output = new Output(consoleTextArea, input.size());
+				for (int i = 0; i < input.size(); i++) {
+					futures.add(exe.submit(new SourceRunner(this, output, i, sf)));
+				}
 			}
 		}
 	}
