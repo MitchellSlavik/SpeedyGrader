@@ -8,14 +8,20 @@ public class Output {
 	
 	private CopyOnWriteArrayList<String> output;
 	private JTextArea area;
+	private boolean cancelled;
 	
 	public Output(JTextArea area, int runs){
 		this.area = area;
+		this.cancelled = false;
 		output = new CopyOnWriteArrayList<String>();
 		for(int i = 0; i < runs; i++){
 			output.add("Running...");
 		}
 		updateText();
+	}
+	
+	public void cancel(){
+		cancelled = true;
 	}
 	
 	public void setOutput(int i, String out){
@@ -24,6 +30,10 @@ public class Output {
 	}
 	
 	public void updateText(){
+		if(cancelled){
+			return;
+		}	
+		
 		String text = "";
 		for(int i = 0; i < output.size(); i++){
 			if(output.size() > 1){
@@ -31,7 +41,14 @@ public class Output {
 			}
 			text += output.get(i) + "\n";
 		}
-		area.setText(text);
+		
+		// Just make sure we arn't cancelled since the cancel will come from another thread
+		if(!cancelled){ 
+			area.setText(text);
+			System.out.println("----------");
+			System.out.println(text);
+			System.out.println("----------");
+		}
 	}
 
 }

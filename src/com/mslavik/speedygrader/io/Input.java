@@ -49,5 +49,18 @@ public class Input {
 	public String get(int i){
 		return input.get(i);
 	}
+	
+	public void clear(){
+		input.clear();
+		input.add("");
+	}
+	
+	public void add(String s){
+		if(input.get(0).equals("")){
+			input.set(0, s);
+		}else{
+			input.add(s);
+		}
+	}
 
 }
