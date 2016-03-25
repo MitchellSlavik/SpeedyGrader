@@ -159,12 +159,7 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 				newFolderSelected();
 			}
 		} else if (ae.getSource().equals(inputItem)) {
-			JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.home")));
-			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			int ret = chooser.showOpenDialog(this);
-			if (ret == JFileChooser.APPROVE_OPTION) {
-				input.parseFile(chooser.getSelectedFile());
-			}
+			new InputCreator(this);
 		} else if (ae.getSource().equals(saveItem)) {
 			filesList.getSelectedValue().save(editorTextArea.getText());
 			editorText = editorTextArea.getText();
