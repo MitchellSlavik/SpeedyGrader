@@ -45,6 +45,7 @@ public class InputCreator extends JDialog implements ActionListener, WindowListe
 		mainPanel.setLayout(new BorderLayout());
 
 		JLabel l = new JLabel("Input Editor", SwingConstants.CENTER);
+		l.setFont(sg.getTextFont());
 		mainPanel.add(l, BorderLayout.NORTH);
 
 		contentPanel = new JPanel();
@@ -62,10 +63,13 @@ public class InputCreator extends JDialog implements ActionListener, WindowListe
 		buttonPanel.setLayout(new MigLayout("", "[grow][][grow]"));
 		addButton = new JButton("Add new run");
 		addButton.addActionListener(this);
+		addButton.setFont(sg.getTextFont());
 		removeButton = new JButton("Remove last run");
 		removeButton.addActionListener(this);
+		removeButton.setFont(sg.getTextFont());
 		saveButton = new JButton("Save and close");
 		saveButton.addActionListener(this);
+		saveButton.setFont(sg.getTextFont());
 		buttonPanel.add(addButton, "align center");
 		buttonPanel.add(removeButton, "align center");
 		buttonPanel.add(saveButton, "align center");

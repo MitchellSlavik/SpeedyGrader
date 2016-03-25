@@ -45,9 +45,7 @@ public class Output {
 		// Just make sure we arn't cancelled since the cancel will come from another thread
 		if(!cancelled){ 
 			area.setText(text);
-			System.out.println("----------");
-			System.out.println(text);
-			System.out.println("----------");
+			area.repaint();
 		}
 	}
 

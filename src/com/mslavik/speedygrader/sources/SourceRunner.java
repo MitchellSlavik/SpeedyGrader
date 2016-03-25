@@ -47,7 +47,7 @@ public class SourceRunner implements Runnable {
 				out.close();
 			}
 			
-			if (p.waitFor(10, TimeUnit.SECONDS)) {
+			if (!sg.timeoutPrograms() || (sg.timeoutPrograms() && p.waitFor(10, TimeUnit.SECONDS))) {
 				String l = null;
 				String s = "";
 				BufferedReader in = new BufferedReader(new InputStreamReader(new SequenceInputStream(p.getInputStream(), p.getErrorStream())));

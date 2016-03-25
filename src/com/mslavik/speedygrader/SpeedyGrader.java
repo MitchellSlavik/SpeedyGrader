@@ -15,6 +15,7 @@ import java.util.concurrent.Future;
 
 import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JList;
@@ -46,6 +47,7 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 
 	private JMenuBar menuBar;
 	private JMenuItem openItem, inputItem, saveItem;
+	private JCheckBoxMenuItem timeoutPrograms;
 	private JList<SourceFile> filesList;
 	private DefaultListModel<SourceFile> filesListModel;
 	private JSplitPane splitMainPane;
@@ -109,7 +111,17 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 		fileMenu.add(inputItem);
 		fileMenu.add(saveItem);
 		
+		JMenu optionsMenu = new JMenu(" Options ");
+		optionsMenu.setMnemonic(KeyEvent.VK_O);
+		
+		timeoutPrograms = new JCheckBoxMenuItem("Timeout Programs");
+		timeoutPrograms.setSelected(true);
+		timeoutPrograms.setFont(textFont);
+		optionsMenu.add(timeoutPrograms);
+		
 		menuBar.add(fileMenu);
+		
+		menuBar.add(optionsMenu);
 
 		this.setJMenuBar(menuBar);
 
@@ -279,6 +291,14 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 
 	public Input getInput() {
 		return input;
+	}
+	
+	public Font getTextFont(){
+		return textFont;
+	}
+	
+	public boolean timeoutPrograms(){
+		return timeoutPrograms.isSelected();
 	}
 
 }
