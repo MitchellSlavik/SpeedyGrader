@@ -1,4 +1,4 @@
-package com.mslavik.speedygrader.sources;
+package com.mslavik.speedygrader.source;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

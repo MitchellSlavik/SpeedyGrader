@@ -36,11 +36,11 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 
 import com.mslavik.speedygrader.io.Input;
 import com.mslavik.speedygrader.io.Output;
-import com.mslavik.speedygrader.sources.CppFile;
-import com.mslavik.speedygrader.sources.JavaFile;
-import com.mslavik.speedygrader.sources.SourceFile;
-import com.mslavik.speedygrader.sources.SourceRunner;
-import com.mslavik.speedygrader.sources.SourceType;
+import com.mslavik.speedygrader.source.CppFile;
+import com.mslavik.speedygrader.source.JavaFile;
+import com.mslavik.speedygrader.source.SourceFile;
+import com.mslavik.speedygrader.source.SourceRunner;
+import com.mslavik.speedygrader.source.SourceType;
 
 @SuppressWarnings("serial")
 public class SpeedyGrader extends JFrame implements ActionListener, ListSelectionListener {
