@@ -1,20 +1,18 @@
 package com.mslavik.speedygrader.source;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.SequenceInputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+
+import com.mslavik.speedygrader.Utilities;
 
 public class JavaFile extends SourceFile {
 
 	public JavaFile(File originalFileLoc) {
 		super(SourceType.JAVA, originalFileLoc);
 		
-		className = getClassName(originalFileLoc);
+		className = Utilities.getJavaClassName(originalFileLoc);
 		
 		if(className.equals("")){
 			System.out.println("Could not find the class name for: "+originalFileLoc.getAbsolutePath());
@@ -34,51 +32,18 @@ public class JavaFile extends SourceFile {
 	}
 
 	@Override
-	public String compile() {
+	protected ProcessBuilder getCompileProcessBuilder() {
 		File file = null;
 		if(newFileLoc != null && newFileLoc.exists()){
 			file = newFileLoc;
 		}else{
 			file = fileLoc;
 		}
-		String compileErrors = "";
-		ProcessBuilder pb = new ProcessBuilder("javac", "-d", "\"" + binFolder.getAbsolutePath() + "\"","\"" + file.getAbsolutePath() + "\"");
-		try {
-			Process p = pb.start();
-			p.waitFor();
-			
-			BufferedReader in = new BufferedReader(new InputStreamReader(new SequenceInputStream(p.getInputStream(), p.getErrorStream())));
-			String line = null;
-			
-			while ((line = in.readLine()) != null) {
-				compileErrors += line + "\n";
-			}
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
-		}
-		return compileErrors;
-	}
+		return new ProcessBuilder("javac", "-d", "\"" + binFolder.getAbsolutePath() + "\"","\"" + file.getAbsolutePath() + "\"");
+	};
+		
+		
 	
-	private String getClassName(File f) {
-		String ret = "";
-		try {
-			BufferedReader in = new BufferedReader(new FileReader(f));
-			String line = in.readLine();
-			while (line != null) {
-
-				if (line.contains("class") && !line.contains("import")) {
-					int classIndex = line.indexOf("class");
-					ret = line.substring(classIndex + 6, line.indexOf(" ", classIndex + 6));
-					break;
-				}
-
-				line = in.readLine();
-			}
-			in.close();
-		} catch (Exception e) {
-		}
-
-		return ret;
-	}
+	
 
 }

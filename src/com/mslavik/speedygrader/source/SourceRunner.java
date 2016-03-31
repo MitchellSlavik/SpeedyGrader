@@ -35,7 +35,7 @@ public class SourceRunner implements Runnable {
 				b = new ProcessBuilder("\""+SourceFile.getBinFolder().getAbsolutePath()+File.separator+sf+".exe\"");
 				break;
 			case JAVA:
-				b = new ProcessBuilder("java", "-cp", "\""+SourceFile.getBinFolder().getAbsolutePath()+"\"", "\""+sf.toString()+"\"");
+				b = new ProcessBuilder("java", "-cp", "\""+SourceFile.getBinFolder().getAbsolutePath()+"\"", "\""+sf+"\"");
 				break;
 			}
 			

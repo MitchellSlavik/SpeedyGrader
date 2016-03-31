@@ -6,9 +6,15 @@ import com.mslavik.speedygrader.source.SourceType;
 
 public class JavaGroupFile extends SourceGroup{
 
-	protected JavaGroupFile(File originalFileLoc) {
-		super(SourceType.JAVA, originalFileLoc);
-		// TODO Auto-generated constructor stub
+	protected JavaGroupFile(File mainFileLoc) {
+		super(SourceType.JAVA, mainFileLoc);
+		
+		
+	}
+
+	@Override
+	protected ProcessBuilder getCompileProcessBuilder() {
+		return null;
 	}
 
 }

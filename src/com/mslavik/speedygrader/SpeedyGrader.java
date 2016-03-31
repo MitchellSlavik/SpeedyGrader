@@ -187,18 +187,10 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 		consoleTextArea.setText("");
 		filesListModel.clear();
 		currentSourceFile = null;
-		for (File f : filesLoc.listFiles(new FileFilter() {
-			@Override
-			public boolean accept(File f) {
-				if (f.isFile()){
-					return SourceType.getSourceType(f) != null;
-				}
-				return false;
-			}
-		})) {
+		for (File f : filesLoc.listFiles(new SpeedyGraderFileFilter())) {
 			SourceType st = SourceType.getSourceType(f);
 
-			if (st != null) {
+			if (st != null && SourceFile.hasMain(st, f)) {
 				SourceFile sf = null;
 
 				switch (st) {

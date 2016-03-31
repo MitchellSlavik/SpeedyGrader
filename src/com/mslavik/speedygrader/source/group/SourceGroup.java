@@ -9,13 +9,6 @@ public abstract class SourceGroup extends SourceFile{
 
 	protected SourceGroup(SourceType type, File originalFileLoc) {
 		super(type, originalFileLoc);
-		// TODO Auto-generated constructor stub
-	}
-
-	@Override
-	public String compile() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }
