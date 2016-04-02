@@ -12,7 +12,7 @@ public class JavaFile extends SourceFile {
 	public JavaFile(File originalFileLoc) {
 		super(SourceType.JAVA, originalFileLoc);
 		
-		className = Utilities.getJavaClassName(originalFileLoc);
+		className = Utilities.getJavaName(originalFileLoc);
 		
 		if(className.equals("")){
 			System.out.println("Could not find the class name for: "+originalFileLoc.getAbsolutePath());

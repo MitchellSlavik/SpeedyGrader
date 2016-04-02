@@ -15,9 +15,9 @@ public abstract class SourceFile {
 	protected static File binFolder;
 	
 	public static void setFolders(File folder){
-		srcFolder = new File(folder, "src");
+		srcFolder = new File(folder, ".src");
 		srcFolder.mkdirs();
-		binFolder = new File(folder, "bin");
+		binFolder = new File(folder, ".bin");
 		binFolder.mkdirs();
 	}
 	
@@ -40,7 +40,7 @@ public abstract class SourceFile {
 			
 			switch(st){
 			case CPP:
-				match = ".*int main.*";
+				match = ".*(int|void) main.*";
 				break;
 			case JAVA:
 				match = ".*void main.*";
@@ -50,6 +50,7 @@ public abstract class SourceFile {
 			while (line != null) {
 
 				if(line.matches(match)){
+					haveMain = true;
 					break;
 				}
 

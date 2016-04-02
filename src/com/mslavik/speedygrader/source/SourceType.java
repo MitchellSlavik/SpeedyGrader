@@ -17,7 +17,9 @@ public enum SourceType {
 	
 	private SourceType(String extention, String... moreExtentions){
 		this(extention);
-		moreExts.addAll(moreExts);
+		for(String s : moreExtentions){
+			moreExts.add(s);
+		}
 	}
 	
 	public String getExtention() {
@@ -28,6 +30,11 @@ public enum SourceType {
 		for(SourceType st : values()){
 			if(f.getName().endsWith(st.getExtention())){
 				return st;
+			}
+			for(String ext : st.moreExts){
+				if(f.getName().endsWith(ext)){
+					return st;
+				}
 			}
 		}
 		return null;

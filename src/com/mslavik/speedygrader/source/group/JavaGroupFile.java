@@ -6,10 +6,10 @@ import com.mslavik.speedygrader.source.SourceType;
 
 public class JavaGroupFile extends SourceGroup{
 
-	protected JavaGroupFile(File mainFileLoc) {
+	public JavaGroupFile(File mainFileLoc) {
 		super(SourceType.JAVA, mainFileLoc);
 		
-		
+		//TODO
 	}
 
 	@Override

@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -25,6 +24,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.event.ListSelectionEvent;
@@ -41,6 +41,8 @@ import com.mslavik.speedygrader.source.JavaFile;
 import com.mslavik.speedygrader.source.SourceFile;
 import com.mslavik.speedygrader.source.SourceRunner;
 import com.mslavik.speedygrader.source.SourceType;
+import com.mslavik.speedygrader.source.group.CppGroupFile;
+import com.mslavik.speedygrader.source.group.JavaGroupFile;
 
 @SuppressWarnings("serial")
 public class SpeedyGrader extends JFrame implements ActionListener, ListSelectionListener {
@@ -52,6 +54,7 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 	private DefaultListModel<SourceFile> filesListModel;
 	private JSplitPane splitMainPane;
 	private JSplitPane splitEditorPane;
+	private JTabbedPane tabbedPane;
 	private RSyntaxTextArea editorTextArea;
 	private JTextArea consoleTextArea;
 	private String editorText = "";
@@ -136,7 +139,10 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 		filesListModel = new DefaultListModel<SourceFile>();
 
 		filesList.setModel(filesListModel);
-
+		
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
+		
+		
 		editorTextArea = new RSyntaxTextArea();
 		editorTextArea.setEditable(true);
 		editorTextArea.setCodeFoldingEnabled(true);
@@ -147,7 +153,7 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 		consoleTextArea.setFont(textFont);
 
 		splitEditorPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		splitEditorPane.add(new RTextScrollPane(editorTextArea));
+		splitEditorPane.add(tabbedPane);
 		splitEditorPane.add(new JScrollPane(consoleTextArea));
 		splitEditorPane.setDividerLocation(.8);
 
@@ -187,23 +193,51 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 		consoleTextArea.setText("");
 		filesListModel.clear();
 		currentSourceFile = null;
+		
+		FolderSorter.sort(filesLoc);
+		
 		for (File f : filesLoc.listFiles(new SpeedyGraderFileFilter())) {
-			SourceType st = SourceType.getSourceType(f);
-
-			if (st != null && SourceFile.hasMain(st, f)) {
-				SourceFile sf = null;
-
-				switch (st) {
-				case CPP:
-					sf = new CppFile(f);
-					break;
-				case JAVA:
-					sf = new JavaFile(f);
-					break;
+			if(f.isFile()){
+				SourceType st = SourceType.getSourceType(f);
+	
+				if (st != null && SourceFile.hasMain(st, f)) {
+					SourceFile sf = null;
+	
+					switch (st) {
+					case CPP:
+						sf = new CppFile(f);
+						break;
+					case JAVA:
+						sf = new JavaFile(f);
+						break;
+					}
+					
+					if (sf != null) {
+						filesListModel.addElement(sf);
+					}
 				}
-				
-				if (sf != null) {
-					filesListModel.addElement(sf);
+			}else{
+				for(File f2 : f.listFiles(new SpeedyGraderFileFilter())){
+					SourceType st = SourceType.getSourceType(f2);
+					
+					if (st != null && SourceFile.hasMain(st, f2)) {
+						SourceFile sf = null;
+						
+						switch (st) {
+						case CPP:
+							sf = new CppGroupFile(f2);
+							break;
+						case JAVA:
+							sf = new JavaGroupFile(f2);
+							break;
+						}
+						
+						if (sf != null) {
+							filesListModel.addElement(sf);
+						}
+						
+						break;
+					}
 				}
 			}
 		}
