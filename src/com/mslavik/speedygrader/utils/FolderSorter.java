@@ -1,4 +1,4 @@
-package com.mslavik.speedygrader;
+package com.mslavik.speedygrader.utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -135,6 +135,20 @@ public class FolderSorter {
 							e.printStackTrace();
 						}
 						f2.delete();
+					}
+				}
+			}
+		}
+		
+		// Now all files are in the folders they need to be in.
+		// Rename as we can.
+		for(File d : dir.listFiles(new SpeedyGraderFileFilter())){
+			if(d.isDirectory()){
+				for(File f : d.listFiles(new SpeedyGraderFileFilter())){
+					String[] s = f.getName().split("_assignsubmission_file_");
+					if(s.length > 1){
+						File f2 = new File(d, s[s.length-1]);
+						f.renameTo(f2);
 					}
 				}
 			}

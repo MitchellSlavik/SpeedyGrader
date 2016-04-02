@@ -3,8 +3,8 @@ package com.mslavik.speedygrader.source.group;
 import java.io.File;
 import java.util.ArrayList;
 
-import com.mslavik.speedygrader.SpeedyGraderFileFilter;
 import com.mslavik.speedygrader.source.SourceType;
+import com.mslavik.speedygrader.utils.SpeedyGraderFileFilter;
 
 public class CppGroupFile extends SourceGroup {
 
@@ -19,6 +19,7 @@ public class CppGroupFile extends SourceGroup {
 		ArrayList<String> args = new ArrayList<String>();
 		
 		args.add("g++");
+		args.add("-std=c++11");
 		for(File f : fileLoc.getParentFile().listFiles(new SpeedyGraderFileFilter())){
 			if(f.getName().endsWith(SourceType.CPP.getExtention())){
 				args.add("\""+f.getAbsolutePath()+"\"");
@@ -26,7 +27,6 @@ public class CppGroupFile extends SourceGroup {
 		}
 		args.add("-o");
 		args.add("\"" + binFolder.getAbsolutePath() + File.separator + className + ".exe\"");
-		System.out.println(args);
 		return new ProcessBuilder(args);
 	}
 

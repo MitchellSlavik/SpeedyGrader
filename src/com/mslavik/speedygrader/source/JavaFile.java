@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
-import com.mslavik.speedygrader.Utilities;
+import com.mslavik.speedygrader.utils.Utilities;
 
 public class JavaFile extends SourceFile {
 

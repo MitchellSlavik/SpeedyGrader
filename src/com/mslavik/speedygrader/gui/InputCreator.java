@@ -1,4 +1,4 @@
-package com.mslavik.speedygrader;
+package com.mslavik.speedygrader.gui;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;

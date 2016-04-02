@@ -2,12 +2,12 @@ package com.mslavik.speedygrader.source;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.io.SequenceInputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public abstract class SourceFile {
 	
@@ -80,22 +80,6 @@ public abstract class SourceFile {
 		return className;
 	}
 	
-	public String getFileText(){
-		String text = "";
-		try {
-			BufferedReader in = new BufferedReader(new FileReader(fileLoc));
-			String line = in.readLine();
-			while (line != null) {
-				text+=line + "\n";
-				line = in.readLine();
-			}
-			in.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return text;
-	}
-	
 	public String compile(){
 		String compileErrors = "";
 		ProcessBuilder pb = getCompileProcessBuilder();
@@ -109,6 +93,16 @@ public abstract class SourceFile {
 			while ((line = in.readLine()) != null) {
 				compileErrors += line + "\n";
 			}
+			
+			if(type == SourceType.CPP){
+				if(compileErrors.toLowerCase().contains("#include \"stdafx.h\"")){
+					File fakeH = new File(fileLoc.getParentFile(), "stdafx.h");
+					if(!fakeH.exists()){
+						fakeH.createNewFile();
+						return compile();
+					}
+				}
+			}
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -117,26 +111,15 @@ public abstract class SourceFile {
 	
 	protected abstract ProcessBuilder getCompileProcessBuilder();
 	
-	public void save(String toWrite){
-		try {
-			PrintWriter pw = new PrintWriter(fileLoc);
-			pw.append(toWrite);
-			pw.flush();
-			pw.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+	public HashMap<String, ArrayList<File>> getFileList(){
+		HashMap<String, ArrayList<File>> files = new HashMap<String, ArrayList<File>>();
+		ArrayList<File> f = new ArrayList<File>();
+		f.add(fileLoc);
+		if(newFileLoc != null){
+			f.add(newFileLoc);
 		}
-		
-		if(newFileLoc != null && newFileLoc.exists()){
-			try {
-				PrintWriter pw = new PrintWriter(newFileLoc);
-				pw.append(toWrite);
-				pw.flush();
-				pw.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
+		files.put(className, f);
+		return files;
 	}
 
 }

@@ -1,4 +1,4 @@
-package com.mslavik.speedygrader;
+package com.mslavik.speedygrader.gui;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -30,10 +31,6 @@ import javax.swing.KeyStroke;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
-import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
-import org.fife.ui.rtextarea.RTextScrollPane;
-
 import com.mslavik.speedygrader.io.Input;
 import com.mslavik.speedygrader.io.Output;
 import com.mslavik.speedygrader.source.CppFile;
@@ -43,6 +40,8 @@ import com.mslavik.speedygrader.source.SourceRunner;
 import com.mslavik.speedygrader.source.SourceType;
 import com.mslavik.speedygrader.source.group.CppGroupFile;
 import com.mslavik.speedygrader.source.group.JavaGroupFile;
+import com.mslavik.speedygrader.utils.FolderSorter;
+import com.mslavik.speedygrader.utils.SpeedyGraderFileFilter;
 
 @SuppressWarnings("serial")
 public class SpeedyGrader extends JFrame implements ActionListener, ListSelectionListener {
@@ -55,10 +54,8 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 	private JSplitPane splitMainPane;
 	private JSplitPane splitEditorPane;
 	private JTabbedPane tabbedPane;
-	private RSyntaxTextArea editorTextArea;
+	private ArrayList<EditorPanel> editorPanels;
 	private JTextArea consoleTextArea;
-	private String editorText = "";
-	private SourceFile currentSourceFile;
 
 	private File filesLoc;
 	private Input input;
@@ -105,7 +102,7 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 		inputItem.setFont(textFont);
 		inputItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, ActionEvent.CTRL_MASK));
 
-		saveItem = new JMenuItem("Save and Run");
+		saveItem = new JMenuItem("Save All and Run");
 		saveItem.addActionListener(this);
 		saveItem.setFont(textFont);
 		saveItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
@@ -142,12 +139,8 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 		
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
 		
+		editorPanels = new ArrayList<EditorPanel>();
 		
-		editorTextArea = new RSyntaxTextArea();
-		editorTextArea.setEditable(true);
-		editorTextArea.setCodeFoldingEnabled(true);
-		editorTextArea.setFont(textFont);
-		editorTextArea.setTabSize(4);
 		consoleTextArea = new JTextArea();
 		consoleTextArea.setEditable(false);
 		consoleTextArea.setFont(textFont);
@@ -181,18 +174,19 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 		} else if (ae.getSource().equals(inputItem)) {
 			new InputCreator(this);
 		} else if (ae.getSource().equals(saveItem)) {
-			filesList.getSelectedValue().save(editorTextArea.getText());
-			editorText = editorTextArea.getText();
+			for(EditorPanel ep : editorPanels){
+				ep.save();
+			}
 			startComplieAndRun();
 		}
 	}
 
 	public void newFolderSelected() {
 		SourceFile.setFolders(filesLoc);
-		editorTextArea.setText("");
+		tabbedPane.removeAll();
+		editorPanels.clear();
 		consoleTextArea.setText("");
 		filesListModel.clear();
-		currentSourceFile = null;
 		
 		FolderSorter.sort(filesLoc);
 		
@@ -249,11 +243,19 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 	@Override
 	public void valueChanged(ListSelectionEvent lse) {
 		if (!lse.getValueIsAdjusting()) {
-			if(!editorTextArea.getText().equals(editorText) && currentSourceFile != null){
+			boolean needsSave = false;
+			for(EditorPanel ep : editorPanels){
+				if(ep.needsSave()){
+					needsSave = true;
+				}
+			}
+			if(needsSave){
 				int i = JOptionPane.showConfirmDialog(this, "Would you like to save before switching files?", "Save?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 				switch(i){
 				case JOptionPane.YES_OPTION:
-					currentSourceFile.save(editorTextArea.getText());
+					for(EditorPanel ep : editorPanels){
+						ep.save();
+					}
 					break;
 				case JOptionPane.NO_OPTION:
 					break;
@@ -262,23 +264,20 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 					return;
 				}
 			}
+			tabbedPane.removeAll();
+			editorPanels.clear();
 			
-			SourceFile sf = filesList.getSelectedValue();
-			editorTextArea.setText(sf.getFileText());
-			editorText = editorTextArea.getText();
-			currentSourceFile = sf;
-			switch(sf.getSourceType()){
-			case CPP:
-				editorTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_CPLUSPLUS);
-				break;
-			case JAVA:
-				editorTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
-				break;
+			for(Entry<String, ArrayList<File>> ents : filesList.getSelectedValue().getFileList().entrySet()){
+				EditorPanel ep = null;
+				if(ents.getValue().size() > 1){
+					ep = new EditorPanel(ents.getValue().get(0), ents.getValue().get(1), textFont);
+				}else{
+					ep = new EditorPanel(ents.getValue().get(0), textFont);
+				}
+				tabbedPane.addTab(ents.getKey(), ep);
+				editorPanels.add(ep);
 			}
 			
-			if(splitEditorPane.getDividerLocation() == 0){
-				splitEditorPane.setDividerLocation(.5);
-			}
 			startComplieAndRun();
 		}
 	}
@@ -314,7 +313,7 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 			}
 		}
 	}
-
+	
 	public Input getInput() {
 		return input;
 	}
