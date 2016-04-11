@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.mslavik.speedygrader.gui.SpeedyGrader;
 import com.mslavik.speedygrader.io.Output;
+import com.mslavik.speedygrader.utils.Utilities;
 
 public class SourceRunner implements Runnable {
 
@@ -33,10 +34,10 @@ public class SourceRunner implements Runnable {
 			ProcessBuilder b = null; 
 			switch(sf.getSourceType()){
 			case CPP:
-				b = new ProcessBuilder("\""+SourceFile.getBinFolder().getAbsolutePath()+File.separator+sf+".exe\"");
+				b = new ProcessBuilder("\""+Utilities.getBinFolder().getAbsolutePath()+File.separator+sf+".exe\"");
 				break;
 			case JAVA:
-				b = new ProcessBuilder("java", "-cp", "\""+SourceFile.getBinFolder().getAbsolutePath()+"\"", "\""+sf+"\"");
+				b = new ProcessBuilder("java", "-cp", "\""+Utilities.getBinFolder().getAbsolutePath()+"\"", "\""+sf+"\"");
 				break;
 			}
 			

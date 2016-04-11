@@ -5,13 +5,12 @@ import java.util.ArrayList;
 
 import com.mslavik.speedygrader.source.SourceType;
 import com.mslavik.speedygrader.utils.SpeedyGraderFileFilter;
+import com.mslavik.speedygrader.utils.Utilities;
 
 public class CppGroupFile extends SourceGroup {
 
 	public CppGroupFile(File mainFileLoc) {
 		super(SourceType.CPP, mainFileLoc);
-		
-		className = mainFileLoc.getName().substring(0, mainFileLoc.getName().length()-SourceType.CPP.getExtention().length());
 	}
 
 	@Override
@@ -26,7 +25,7 @@ public class CppGroupFile extends SourceGroup {
 			}
 		}
 		args.add("-o");
-		args.add("\"" + binFolder.getAbsolutePath() + File.separator + className + ".exe\"");
+		args.add("\"" + Utilities.getBinFolder().getAbsolutePath() + File.separator + className + ".exe\"");
 		return new ProcessBuilder(args);
 	}
 

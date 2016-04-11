@@ -19,14 +19,9 @@ import com.mslavik.speedygrader.source.SourceType;
 @SuppressWarnings("serial")
 public class EditorPanel extends JPanel {
 	
-	private File editedFile, editedFile2;
+	private File editedFile;
 	private RSyntaxTextArea textArea;
 	private String savedText;
-	
-	public EditorPanel(File editedFile, File editedFile2, Font editorFont){
-		this(editedFile, editorFont);
-		this.editedFile2 = editedFile2;
-	}
 	
 	public EditorPanel(File editedFile, Font editorFont) {
 		this.editedFile = editedFile;
@@ -83,17 +78,6 @@ public class EditorPanel extends JPanel {
 			}
 			
 			savedText = textArea.getText();
-			
-			if(editedFile2 != null && editedFile2.exists()){
-				try {
-					PrintWriter pw = new PrintWriter(editedFile2);
-					pw.append(textArea.getText());
-					pw.flush();
-					pw.close();
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				}
-			}
 		}
 	}
 	

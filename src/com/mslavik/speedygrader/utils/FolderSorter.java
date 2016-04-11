@@ -9,7 +9,6 @@ import java.util.HashMap;
 
 import javax.swing.JOptionPane;
 
-import com.mslavik.speedygrader.source.SourceFile;
 import com.mslavik.speedygrader.source.SourceType;
 
 public class FolderSorter {
@@ -26,7 +25,7 @@ public class FolderSorter {
 				SourceType st = SourceType.getSourceType(f);
 
 				if (st != null) {
-					if (SourceFile.hasMain(st, f)) {
+					if (Utilities.hasMain(st, f)) {
 						files.put(f, new ArrayList<File>());
 					} else {
 						filesNoMain.add(f);
@@ -150,6 +149,22 @@ public class FolderSorter {
 						File f2 = new File(d, s[s.length-1]);
 						f.renameTo(f2);
 					}
+				}
+			}
+		}
+		
+		for(File f : dir.listFiles(new SpeedyGraderFileFilter(SourceType.JAVA))){
+			if(f.isDirectory()){
+				for(File f2 : f.listFiles(new SpeedyGraderFileFilter(SourceType.JAVA))){
+					File f3 = new File(f, Utilities.getJavaName(f2) + ".java");
+					if(!f3.getName().equals(".java") && !f2.getName().equals(f3.getName())){
+						f2.renameTo(f3);
+					}
+				}
+			}else if(f.isFile()){
+				File f3 = new File(f, Utilities.getJavaName(f) + ".java");
+				if(!f3.getName().equals(".java") && !f.getName().equals(f3.getName())){
+					f.renameTo(f3);
 				}
 			}
 		}

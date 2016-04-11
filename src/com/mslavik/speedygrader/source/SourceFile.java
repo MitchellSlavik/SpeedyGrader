@@ -11,60 +11,10 @@ import java.util.HashMap;
 
 public abstract class SourceFile {
 	
-	protected static File srcFolder;
-	protected static File binFolder;
 	
-	public static void setFolders(File folder){
-		srcFolder = new File(folder, ".src");
-		srcFolder.mkdirs();
-		binFolder = new File(folder, ".bin");
-		binFolder.mkdirs();
-	}
-	
-	public static File getBinFolder(){
-		return binFolder;
-	}
-	
-	public static File getSrcFolder(){
-		return srcFolder;
-	}
-	
-	public static boolean hasMain(SourceType st, File f) {
-		boolean haveMain = false;
-		
-		try {
-			BufferedReader in = new BufferedReader(new FileReader(f));
-			String line = in.readLine();
-			
-			String match = "";
-			
-			switch(st){
-			case CPP:
-				match = ".*(int|void) main.*";
-				break;
-			case JAVA:
-				match = ".*void main.*";
-				break;
-			}
-			
-			while (line != null) {
-
-				if(line.matches(match)){
-					haveMain = true;
-					break;
-				}
-
-				line = in.readLine();
-			}
-			in.close();
-		} catch (Exception e) {
-		}
-		return haveMain;
-	}
 	
 	protected String className;
 	protected File fileLoc;
-	protected File newFileLoc;
 	protected SourceType type;
 	
 	protected SourceFile(SourceType type, File originalFileLoc){
@@ -111,14 +61,9 @@ public abstract class SourceFile {
 	
 	protected abstract ProcessBuilder getCompileProcessBuilder();
 	
-	public HashMap<String, ArrayList<File>> getFileList(){
-		HashMap<String, ArrayList<File>> files = new HashMap<String, ArrayList<File>>();
-		ArrayList<File> f = new ArrayList<File>();
-		f.add(fileLoc);
-		if(newFileLoc != null){
-			f.add(newFileLoc);
-		}
-		files.put(className, f);
+	public HashMap<String, File> getFileList(){
+		HashMap<String, File> files = new HashMap<String, File>();
+		files.put(className, fileLoc);
 		return files;
 	}
 

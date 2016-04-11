@@ -1,7 +1,6 @@
 package com.mslavik.speedygrader.source.group;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.mslavik.speedygrader.source.SourceFile;
@@ -10,18 +9,18 @@ import com.mslavik.speedygrader.utils.SpeedyGraderFileFilter;
 
 public abstract class SourceGroup extends SourceFile{
 
-	protected SourceGroup(SourceType type, File originalFileLoc) {
-		super(type, originalFileLoc);
+	protected SourceGroup(SourceType type, File fileLoc) {
+		super(type, fileLoc);
+		
+		className = fileLoc.getName().substring(0, fileLoc.getName().length()-type.getExtention().length());
 	}
 	
 	@Override
-	public HashMap<String, ArrayList<File>> getFileList() {
-		HashMap<String, ArrayList<File>> files = super.getFileList();
+	public HashMap<String, File> getFileList() {
+		HashMap<String, File> files = super.getFileList();
 		
 		for(File f : fileLoc.getParentFile().listFiles(new SpeedyGraderFileFilter(type))){
-			ArrayList<File> a = new ArrayList<File>();
-			a.add(f);
-			files.put(f.getName(), a);
+			files.put(f.getName(), f);
 		}
 		
 		return files;

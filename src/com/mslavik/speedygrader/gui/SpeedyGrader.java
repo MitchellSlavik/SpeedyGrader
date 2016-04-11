@@ -42,6 +42,7 @@ import com.mslavik.speedygrader.source.group.CppGroupFile;
 import com.mslavik.speedygrader.source.group.JavaGroupFile;
 import com.mslavik.speedygrader.utils.FolderSorter;
 import com.mslavik.speedygrader.utils.SpeedyGraderFileFilter;
+import com.mslavik.speedygrader.utils.Utilities;
 
 @SuppressWarnings("serial")
 public class SpeedyGrader extends JFrame implements ActionListener, ListSelectionListener {
@@ -182,7 +183,7 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 	}
 
 	public void newFolderSelected() {
-		SourceFile.setFolders(filesLoc);
+		Utilities.createBinFolder(filesLoc);
 		tabbedPane.removeAll();
 		editorPanels.clear();
 		consoleTextArea.setText("");
@@ -194,7 +195,7 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 			if(f.isFile()){
 				SourceType st = SourceType.getSourceType(f);
 	
-				if (st != null && SourceFile.hasMain(st, f)) {
+				if (st != null && Utilities.hasMain(st, f)) {
 					SourceFile sf = null;
 	
 					switch (st) {
@@ -210,11 +211,11 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 						filesListModel.addElement(sf);
 					}
 				}
-			}else{
+			}else if(f.isDirectory()){
 				for(File f2 : f.listFiles(new SpeedyGraderFileFilter())){
 					SourceType st = SourceType.getSourceType(f2);
 					
-					if (st != null && SourceFile.hasMain(st, f2)) {
+					if (st != null && Utilities.hasMain(st, f2)) {
 						SourceFile sf = null;
 						
 						switch (st) {
@@ -230,6 +231,7 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 							filesListModel.addElement(sf);
 						}
 						
+						// We found a main in this folder, don't look for another one
 						break;
 					}
 				}
@@ -267,13 +269,8 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 			tabbedPane.removeAll();
 			editorPanels.clear();
 			
-			for(Entry<String, ArrayList<File>> ents : filesList.getSelectedValue().getFileList().entrySet()){
-				EditorPanel ep = null;
-				if(ents.getValue().size() > 1){
-					ep = new EditorPanel(ents.getValue().get(0), ents.getValue().get(1), textFont);
-				}else{
-					ep = new EditorPanel(ents.getValue().get(0), textFont);
-				}
+			for(Entry<String, File> ents : filesList.getSelectedValue().getFileList().entrySet()){
+				EditorPanel ep = new EditorPanel(ents.getValue(), textFont);
 				tabbedPane.addTab(ents.getKey(), ep);
 				editorPanels.add(ep);
 			}

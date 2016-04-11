@@ -29,7 +29,7 @@ public class SpeedyGraderFileFilter implements FileFilter {
 			}
 		}else if(f.isDirectory()){
 			String name = f.getName();
-			return !name.equalsIgnoreCase(".bin") && !name.equalsIgnoreCase(".src");
+			return !name.equalsIgnoreCase(".bin");
 		}
 		return false;
 	}

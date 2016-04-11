@@ -2,6 +2,8 @@ package com.mslavik.speedygrader.source;
 
 import java.io.File;
 
+import com.mslavik.speedygrader.utils.Utilities;
+
 public class CppFile extends SourceFile {
 
 	public CppFile(File originalFileLoc) {
@@ -12,7 +14,7 @@ public class CppFile extends SourceFile {
 
 	@Override
 	public ProcessBuilder getCompileProcessBuilder() {
-		return new ProcessBuilder("g++", "\""+fileLoc.getAbsolutePath()+"\"", "-o", "\"" + binFolder.getAbsolutePath() + File.separator + className + ".exe\"");
+		return new ProcessBuilder("g++", "\""+fileLoc.getAbsolutePath()+"\"", "-o", "\"" + Utilities.getBinFolder().getAbsolutePath() + File.separator + className + ".exe\"");
 	}
 
 }
