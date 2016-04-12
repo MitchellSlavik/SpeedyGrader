@@ -2,16 +2,12 @@ package com.mslavik.speedygrader.source;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.SequenceInputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public abstract class SourceFile {
-	
-	
 	
 	protected String className;
 	protected File fileLoc;

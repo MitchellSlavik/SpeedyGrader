@@ -55,8 +55,7 @@ public class Utilities {
 		return haveMain;
 	}
 
-	private static Pattern javaPattern = Pattern
-			.compile("public(\\s|\\sabstract\\s)(class|interface|enum)\\s([A-z]|[0-9])+");
+	private static Pattern javaPattern = Pattern.compile("public(\\s|\\sabstract\\s)(class|interface|enum)\\s([A-z]|[0-9])+");
 
 	public static String getJavaName(File f) {
 		if (SourceType.getSourceType(f) == SourceType.JAVA) {
