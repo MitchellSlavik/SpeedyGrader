@@ -3,6 +3,7 @@ package com.mslavik.speedygrader.io;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 public class Output {
 	
@@ -14,10 +15,10 @@ public class Output {
 		this.area = area;
 		this.cancelled = false;
 		output = new CopyOnWriteArrayList<String>();
+		area.setText("Running...");
 		for(int i = 0; i < runs; i++){
-			output.add("Running...");
+			output.add("~!~!~!~");
 		}
-		updateText();
 	}
 	
 	public void cancel(){
@@ -26,7 +27,9 @@ public class Output {
 	
 	public void setOutput(int i, String out){
 		output.set(i, out);
-		updateText();
+		if(!output.contains("~!~!~!~")){
+			updateText();
+		}
 	}
 	
 	public void updateText(){
@@ -43,9 +46,14 @@ public class Output {
 		}
 		
 		// Just make sure we arn't cancelled since the cancel will come from another thread
-		if(!cancelled){ 
+		if(!cancelled){
 			area.setText(text);
-			area.repaint();
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					area.repaint();
+				}
+			});
 		}
 	}
 

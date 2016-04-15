@@ -19,6 +19,7 @@ import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
+import com.mslavik.speedygrader.SpeedyGrader;
 import com.mslavik.speedygrader.io.Input;
 
 import net.miginfocom.swing.MigLayout;
@@ -35,17 +36,17 @@ public class InputCreator extends JDialog implements ActionListener, WindowListe
 
 	private Input in;
 
-	public InputCreator(SpeedyGrader sg) {
-		super(sg, "Input Editor");
+	public InputCreator() {
+		super(SpeedyGrader.getInstance().getGUI(), "Input Editor");
 
-		speedyGrader = sg;
-		in = speedyGrader.getInput();
+		SpeedyGrader sg = SpeedyGrader.getInstance();
+		in = sg.getInput();
 
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new BorderLayout());
 
 		JLabel l = new JLabel("Input Editor", SwingConstants.CENTER);
-		l.setFont(sg.getTextFont());
+		l.setFont(sg.getGUI().getTextFont());
 		mainPanel.add(l, BorderLayout.NORTH);
 
 		contentPanel = new JPanel();
@@ -54,7 +55,6 @@ public class InputCreator extends JDialog implements ActionListener, WindowListe
 		for (int i = 0; i < in.size(); i++) {
 			addRunArea();
 			inputPanels.get(i).setText(in.get(i));
-			;
 		}
 
 		mainPanel.add(new JScrollPane(contentPanel), BorderLayout.CENTER);
@@ -63,13 +63,13 @@ public class InputCreator extends JDialog implements ActionListener, WindowListe
 		buttonPanel.setLayout(new MigLayout("", "[grow][][grow]"));
 		addButton = new JButton("Add new run");
 		addButton.addActionListener(this);
-		addButton.setFont(sg.getTextFont());
+		addButton.setFont(sg.getGUI().getTextFont());
 		removeButton = new JButton("Remove last run");
 		removeButton.addActionListener(this);
-		removeButton.setFont(sg.getTextFont());
+		removeButton.setFont(sg.getGUI().getTextFont());
 		saveButton = new JButton("Save and close");
 		saveButton.addActionListener(this);
-		saveButton.setFont(sg.getTextFont());
+		saveButton.setFont(sg.getGUI().getTextFont());
 		buttonPanel.add(addButton, "align center");
 		buttonPanel.add(removeButton, "align center");
 		buttonPanel.add(saveButton, "align center");
@@ -82,7 +82,7 @@ public class InputCreator extends JDialog implements ActionListener, WindowListe
 		this.setModalityType(ModalityType.APPLICATION_MODAL);
 		this.setSize(500, 350);
 		this.setResizable(false);
-		this.setLocationRelativeTo(sg);
+		this.setLocationRelativeTo(sg.getGUI());
 		this.setVisible(true);
 	}
 

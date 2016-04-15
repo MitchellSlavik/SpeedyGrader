@@ -9,10 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map.Entry;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
 import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBoxMenuItem;
@@ -31,24 +27,14 @@ import javax.swing.KeyStroke;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import com.mslavik.speedygrader.io.Input;
-import com.mslavik.speedygrader.io.Output;
-import com.mslavik.speedygrader.source.CppFile;
-import com.mslavik.speedygrader.source.JavaFile;
+import com.mslavik.speedygrader.SpeedyGrader;
 import com.mslavik.speedygrader.source.SourceFile;
-import com.mslavik.speedygrader.source.SourceRunner;
-import com.mslavik.speedygrader.source.SourceType;
-import com.mslavik.speedygrader.source.group.CppGroupFile;
-import com.mslavik.speedygrader.source.group.JavaGroupFile;
-import com.mslavik.speedygrader.utils.FolderSorter;
-import com.mslavik.speedygrader.utils.SpeedyGraderFileFilter;
-import com.mslavik.speedygrader.utils.Utilities;
 
 @SuppressWarnings("serial")
-public class SpeedyGrader extends JFrame implements ActionListener, ListSelectionListener {
+public class SpeedyGraderInterface extends JFrame implements ActionListener, ListSelectionListener {
 
 	private JMenuBar menuBar;
-	private JMenuItem openItem, inputItem, saveItem;
+	private JMenuItem openItem, inputItem, saveItem, refreshItem;
 	private JCheckBoxMenuItem timeoutPrograms;
 	private JList<SourceFile> filesList;
 	private DefaultListModel<SourceFile> filesListModel;
@@ -58,32 +44,25 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 	private ArrayList<EditorPanel> editorPanels;
 	private JTextArea consoleTextArea;
 
-	private File filesLoc;
-	private Input input;
-	private Output output;
-
 	private Font textFont;
 
-	private ExecutorService exe;
-	private ArrayList<Future<?>> futures = new ArrayList<Future<?>>();
-
-	public SpeedyGrader() {
+	public SpeedyGraderInterface() {
 		super("SpeedyGrader");
 
 		this.setSize(1000, 500);
 		
 		BufferedImage icon = null;
 		try {
-			icon = ImageIO.read(new File( "lib"+File.separator+"speedygrader-icon.png"));
+			icon = ImageIO.read(new File( "img"+File.separator+"speedygrader-icon.png"));
 		} catch (IOException e) {
-			e.printStackTrace();
+			try{
+				icon = ImageIO.read(SpeedyGraderInterface.class.getResourceAsStream("/speedygrader-icon.png"));
+			}catch(IOException e2){
+				e2.printStackTrace();
+			}
 		}
 		
 		this.setIconImage(icon);
-
-		input = new Input();
-
-		exe = Executors.newCachedThreadPool();
 
 		textFont = new Font("Consolas", 0, 16);
 
@@ -114,6 +93,12 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 		
 		JMenu optionsMenu = new JMenu(" Options ");
 		optionsMenu.setMnemonic(KeyEvent.VK_O);
+		
+		refreshItem = new JMenuItem("Refresh Folder");
+		refreshItem.setFont(textFont);
+		refreshItem.addActionListener(this);
+		refreshItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.CTRL_MASK));
+		optionsMenu.add(refreshItem);
 		
 		timeoutPrograms = new JCheckBoxMenuItem("Timeout Programs");
 		timeoutPrograms.setSelected(true);
@@ -169,74 +154,30 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			int ret = chooser.showOpenDialog(this);
 			if (ret == JFileChooser.APPROVE_OPTION) {
-				filesLoc = chooser.getSelectedFile();
-				newFolderSelected();
+				newFolderSelected(chooser.getSelectedFile());
 			}
 		} else if (ae.getSource().equals(inputItem)) {
-			new InputCreator(this);
+			new InputCreator();
 		} else if (ae.getSource().equals(saveItem)) {
 			for(EditorPanel ep : editorPanels){
 				ep.save();
 			}
-			startComplieAndRun();
+			SpeedyGrader.getInstance().startComplieAndRun();
+		}else if (ae.getSource().equals(refreshItem)){
+			newFolderSelected(null);
 		}
 	}
 
-	public void newFolderSelected() {
-		Utilities.createBinFolder(filesLoc);
+	public void newFolderSelected(File dir) {
 		tabbedPane.removeAll();
 		editorPanels.clear();
 		consoleTextArea.setText("");
 		filesListModel.clear();
 		
-		FolderSorter.sort(filesLoc);
-		
-		for (File f : filesLoc.listFiles(new SpeedyGraderFileFilter())) {
-			if(f.isFile()){
-				SourceType st = SourceType.getSourceType(f);
-	
-				if (st != null && Utilities.hasMain(st, f)) {
-					SourceFile sf = null;
-	
-					switch (st) {
-					case CPP:
-						sf = new CppFile(f);
-						break;
-					case JAVA:
-						sf = new JavaFile(f);
-						break;
-					}
-					
-					if (sf != null) {
-						filesListModel.addElement(sf);
-					}
-				}
-			}else if(f.isDirectory()){
-				for(File f2 : f.listFiles(new SpeedyGraderFileFilter())){
-					SourceType st = SourceType.getSourceType(f2);
-					
-					if (st != null && Utilities.hasMain(st, f2)) {
-						SourceFile sf = null;
-						
-						switch (st) {
-						case CPP:
-							sf = new CppGroupFile(f2);
-							break;
-						case JAVA:
-							sf = new JavaGroupFile(f2);
-							break;
-						}
-						
-						if (sf != null) {
-							filesListModel.addElement(sf);
-						}
-						
-						// We found a main in this folder, don't look for another one
-						break;
-					}
-				}
-			}
+		for(SourceFile sf : SpeedyGrader.getInstance().getSourceFiles(dir)){
+			filesListModel.addElement(sf);
 		}
+		
 		splitMainPane.setDividerLocation(.2);
 		this.revalidate();
 		this.repaint();
@@ -269,58 +210,36 @@ public class SpeedyGrader extends JFrame implements ActionListener, ListSelectio
 			tabbedPane.removeAll();
 			editorPanels.clear();
 			
-			for(Entry<String, File> ents : filesList.getSelectedValue().getFileList().entrySet()){
-				EditorPanel ep = new EditorPanel(ents.getValue(), textFont);
-				tabbedPane.addTab(ents.getKey(), ep);
-				editorPanels.add(ep);
+			if(filesList.getSelectedValue() != null){
+				for(Entry<String, File> ents : filesList.getSelectedValue().getFileList().entrySet()){
+					EditorPanel ep = new EditorPanel(ents.getValue(), textFont);
+					tabbedPane.addTab(ents.getKey(), ep);
+					editorPanels.add(ep);
+				}
+				
+				SpeedyGrader.getInstance().startComplieAndRun();
 			}
-			
-			startComplieAndRun();
 		}
 	}
 
-	public void startComplieAndRun() {
-		//New file to compile and run, cancel the old one.
-		if(output != null){
-			output.cancel();
-		}
-		for(Future<?> future : futures){
-			if(!future.isDone()){
-				future.cancel(true);
-			}
-		}
-		futures.clear();
-		
-		//Start the new compile
-		SourceFile sf = filesList.getSelectedValue();
-		consoleTextArea.setText("");
-		
-		if(sf != null){
-			String compileErrors = sf.compile();
-	
-			if (compileErrors.length() != 0) {
-				consoleTextArea.append("Compile Errors:\n" + compileErrors);
-			} else {
-				
-				//Run the inputs if we complied successfully
-				output = new Output(consoleTextArea, input.size());
-				for (int i = 0; i < input.size(); i++) {
-					futures.add(exe.submit(new SourceRunner(this, output, i, sf)));
-				}
-			}
-		}
-	}
-	
-	public Input getInput() {
-		return input;
-	}
-	
 	public Font getTextFont(){
 		return textFont;
 	}
 	
 	public boolean timeoutPrograms(){
 		return timeoutPrograms.isSelected();
+	}
+	
+	public SourceFile getSelectedSourceFile(){
+		return filesList.getSelectedValue();
+	}
+	
+	public void setOutputTextArea(String s){
+		consoleTextArea.setText(s);
+	}
+	
+	public JTextArea getOutputTextArea(){
+		return consoleTextArea;
 	}
 
 }

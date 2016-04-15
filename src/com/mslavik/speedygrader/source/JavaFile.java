@@ -14,10 +14,6 @@ public class JavaFile extends SourceFile {
 	@Override
 	protected ProcessBuilder getCompileProcessBuilder() {
 		return new ProcessBuilder("javac", "-d", "\"" + Utilities.getBinFolder().getAbsolutePath() + "\"","\"" + fileLoc.getAbsolutePath() + "\"");
-	};
-		
-		
+	}
 	
-	
-
 }

@@ -75,12 +75,12 @@ public class Utilities {
 				Matcher m = javaPattern.matcher(text);
 				if (m.find()) {
 					String match = m.group();
-					ret = match.substring(match.lastIndexOf(' '), match.length());
+					ret = match.substring(match.lastIndexOf(' ')+1, match.length());
 				} else {
 					throw new Exception();
 				}
 			} catch (Exception e) {
-				System.out.println("Could not find java type name for: " + f.getAbsolutePath());
+				new Exception("Could not find java type name for: " + f.getAbsolutePath()).printStackTrace();
 			}
 
 			return ret;

@@ -9,19 +9,17 @@ import java.io.OutputStreamWriter;
 import java.io.SequenceInputStream;
 import java.util.concurrent.TimeUnit;
 
-import com.mslavik.speedygrader.gui.SpeedyGrader;
+import com.mslavik.speedygrader.SpeedyGrader;
 import com.mslavik.speedygrader.io.Output;
 import com.mslavik.speedygrader.utils.Utilities;
 
 public class SourceRunner implements Runnable {
 
-	private SpeedyGrader sg;
 	private SourceFile sf;
 	private int i;
 	private Output o;
 
-	public SourceRunner(SpeedyGrader sg, Output o, int i, SourceFile sf) {
-		this.sg = sg;
+	public SourceRunner(Output o, int i, SourceFile sf) {
 		this.i = i;
 		this.o = o;
 		this.sf = sf;
@@ -42,6 +40,8 @@ public class SourceRunner implements Runnable {
 			}
 			
 			p = b.start();
+			
+			SpeedyGrader sg = SpeedyGrader.getInstance();
 
 			if (!sg.getInput().get(0).equals("")) {
 				BufferedWriter out = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));

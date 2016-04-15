@@ -162,9 +162,12 @@ public class FolderSorter {
 					}
 				}
 			}else if(f.isFile()){
-				File f3 = new File(f, Utilities.getJavaName(f) + ".java");
-				if(!f3.getName().equals(".java") && !f.getName().equals(f3.getName())){
-					f.renameTo(f3);
+				String javaName = Utilities.getJavaName(f);
+				if(!javaName.isEmpty()){
+					File f3 = new File(f.getParentFile(), javaName + ".java");
+					if(!f.getName().equals(f3.getName())){
+						f.renameTo(f3);
+					}
 				}
 			}
 		}
