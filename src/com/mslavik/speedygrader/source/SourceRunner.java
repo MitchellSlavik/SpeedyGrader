@@ -39,6 +39,7 @@ public class SourceRunner implements Runnable {
 				break;
 			}
 			
+			b.directory(Utilities.getBinFolder());
 			p = b.start();
 			
 			SpeedyGrader sg = SpeedyGrader.getInstance();
