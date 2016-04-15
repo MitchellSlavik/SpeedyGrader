@@ -59,7 +59,7 @@ public abstract class SourceFile {
 	
 	public HashMap<String, File> getFileList(){
 		HashMap<String, File> files = new HashMap<String, File>();
-		files.put(className, fileLoc);
+		files.put(fileLoc.getName(), fileLoc);
 		return files;
 	}
 
