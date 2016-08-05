@@ -1,12 +1,18 @@
 package com.mslavik.speedygrader.gui;
 
+import java.awt.Desktop;
+import java.awt.Desktop.Action;
 import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 import javax.imageio.ImageIO;
@@ -34,7 +40,7 @@ import com.mslavik.speedygrader.source.SourceFile;
 public class SpeedyGraderInterface extends JFrame implements ActionListener, ListSelectionListener {
 
 	private JMenuBar menuBar;
-	private JMenuItem openItem, inputItem, saveItem, refreshItem;
+	private JMenuItem openItem, inputItem, saveItem, refreshItem, aboutItem, githubItem, upgradeItem, installItem;
 	private JCheckBoxMenuItem timeoutPrograms;
 	private JList<SourceFile> filesList;
 	private DefaultListModel<SourceFile> filesListModel;
@@ -103,11 +109,39 @@ public class SpeedyGraderInterface extends JFrame implements ActionListener, Lis
 		timeoutPrograms = new JCheckBoxMenuItem("Timeout Programs");
 		timeoutPrograms.setSelected(true);
 		timeoutPrograms.setFont(textFont);
+		timeoutPrograms.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, ActionEvent.CTRL_MASK));
 		optionsMenu.add(timeoutPrograms);
 		
-		menuBar.add(fileMenu);
+		JMenu helpMenu = new JMenu("  Help  ");
+		helpMenu.setMnemonic(KeyEvent.VK_H);
 		
+		aboutItem = new JMenuItem("About");
+		aboutItem.setFont(textFont);
+		aboutItem.addActionListener(this);
+		aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
+		helpMenu.add(aboutItem);
+		
+		githubItem = new JMenuItem("Open Github");
+		githubItem.setFont(textFont);
+		githubItem.addActionListener(this);
+		githubItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, ActionEvent.CTRL_MASK));
+		helpMenu.add(githubItem);
+		
+		upgradeItem = new JMenuItem("Upgrade");
+		upgradeItem.setFont(textFont);
+		upgradeItem.addActionListener(this);
+		upgradeItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, ActionEvent.CTRL_MASK));
+		helpMenu.add(upgradeItem);
+		
+		installItem = new JMenuItem("Install Instructions");
+		installItem.setFont(textFont);
+		installItem.addActionListener(this);
+		installItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, ActionEvent.CTRL_MASK | ActionEvent.ALT_MASK));
+		helpMenu.add(installItem);
+		
+		menuBar.add(fileMenu);
 		menuBar.add(optionsMenu);
+		menuBar.add(helpMenu);
 
 		this.setJMenuBar(menuBar);
 
@@ -150,14 +184,18 @@ public class SpeedyGraderInterface extends JFrame implements ActionListener, Lis
 	@Override
 	public void actionPerformed(ActionEvent ae) {
 		if (ae.getSource().equals(openItem)) {
-			JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.home")));
+			File f = null;
+			if(null == (f = SpeedyGrader.getInstance().getFilesLoc())){
+				f = new File(System.getProperty("user.home"));
+			}
+			JFileChooser chooser = new JFileChooser(f);
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			int ret = chooser.showOpenDialog(this);
 			if (ret == JFileChooser.APPROVE_OPTION) {
 				newFolderSelected(chooser.getSelectedFile());
 			}
 		} else if (ae.getSource().equals(inputItem)) {
-			new InputCreator();
+			new InputDialog();
 		} else if (ae.getSource().equals(saveItem)) {
 			for(EditorPanel ep : editorPanels){
 				ep.save();
@@ -165,6 +203,28 @@ public class SpeedyGraderInterface extends JFrame implements ActionListener, Lis
 			SpeedyGrader.getInstance().startComplieAndRun();
 		}else if (ae.getSource().equals(refreshItem)){
 			newFolderSelected(null);
+		}else if (ae.getSource().equals(githubItem)){
+			String url = "https://github.com/MitchellSlavik/SpeedyGrader";
+			Desktop d = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+			if(d != null && d.isSupported(Action.BROWSE)){
+				try {
+					d.browse(URI.create(url));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}else{
+				JOptionPane.showMessageDialog(this, "We were unable to open a web browser. The url has been copied to your clipboard.",
+						"Unable to preform operation", JOptionPane.ERROR_MESSAGE);
+				StringSelection selection = new StringSelection(url);
+			    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			    clipboard.setContents(selection, selection);
+			}
+		}else if (ae.getSource().equals(aboutItem)){
+			new AboutDialog();
+		}else if (ae.getSource().equals(installItem)){
+			//TODO
+		}else if (ae.getSource().equals(upgradeItem)){
+			new AutoUpdater();
 		}
 	}
 
@@ -193,7 +253,8 @@ public class SpeedyGraderInterface extends JFrame implements ActionListener, Lis
 				}
 			}
 			if(needsSave){
-				int i = JOptionPane.showConfirmDialog(this, "Would you like to save before switching files?", "Save?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+				int i = JOptionPane.showConfirmDialog(this, "Would you like to save before switching files?",
+						"Save?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 				switch(i){
 				case JOptionPane.YES_OPTION:
 					for(EditorPanel ep : editorPanels){

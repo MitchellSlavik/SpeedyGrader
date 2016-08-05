@@ -160,5 +160,9 @@ public class SpeedyGrader {
 	public boolean timeoutPrograms(){
 		return gui.timeoutPrograms();
 	}
+	
+	public File getFilesLoc() {
+		return filesLoc;
+	}
 
 }
