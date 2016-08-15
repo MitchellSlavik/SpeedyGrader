@@ -25,9 +25,7 @@ import com.mslavik.speedygrader.io.Input;
 import net.miginfocom.swing.MigLayout;
 
 @SuppressWarnings("serial")
-public class InputCreator extends JDialog implements ActionListener, WindowListener {
-
-	private SpeedyGrader speedyGrader;
+public class InputDialog extends JDialog implements ActionListener, WindowListener {
 
 	private ArrayList<RunArea> inputPanels = new ArrayList<RunArea>();
 
@@ -36,7 +34,7 @@ public class InputCreator extends JDialog implements ActionListener, WindowListe
 
 	private Input in;
 
-	public InputCreator() {
+	public InputDialog() {
 		super(SpeedyGrader.getInstance().getGUI(), "Input Editor");
 
 		SpeedyGrader sg = SpeedyGrader.getInstance();
@@ -115,7 +113,7 @@ public class InputCreator extends JDialog implements ActionListener, WindowListe
 			in.add(inputPanels.get(i).getText());
 		}
 		//We changed the input so lets re-run the current file
-		speedyGrader.startComplieAndRun();
+		SpeedyGrader.getInstance().startComplieAndRun();
 	}
 
 	@Override
