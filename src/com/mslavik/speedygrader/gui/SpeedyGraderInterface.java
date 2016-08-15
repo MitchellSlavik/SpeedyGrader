@@ -127,7 +127,7 @@ public class SpeedyGraderInterface extends JFrame implements ActionListener, Lis
 		githubItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, ActionEvent.CTRL_MASK));
 		helpMenu.add(githubItem);
 		
-		upgradeItem = new JMenuItem("Upgrade");
+		upgradeItem = new JMenuItem("Check for Update");
 		upgradeItem.setFont(textFont);
 		upgradeItem.addActionListener(this);
 		upgradeItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, ActionEvent.CTRL_MASK));

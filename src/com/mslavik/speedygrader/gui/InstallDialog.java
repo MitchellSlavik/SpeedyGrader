@@ -8,7 +8,7 @@ import com.mslavik.speedygrader.SpeedyGrader;
 public class InstallDialog extends JDialog {
 	
 	public InstallDialog() {
-		super(SpeedyGrader.getInstance().getGUI(), "About");
+		super(SpeedyGrader.getInstance().getGUI(), "Install Instructions");
 		
 	}
 

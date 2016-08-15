@@ -1,8 +1,5 @@
 package com.mslavik.speedygrader.gui;
 
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.SplashScreen;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
@@ -10,13 +7,11 @@ import javax.swing.JLabel;
 import javax.swing.JWindow;
 import javax.swing.SwingConstants;
 
+@SuppressWarnings("serial")
 public class SpeedySplash extends JWindow {
 	
-	private SplashScreen sc;
-	private Graphics2D g;
-	private ImageIcon img;
-	
 	public SpeedySplash() {
+		ImageIcon img;
 		URL imgURL = getClass().getResource("/speedygrader-splash.png");
 	    if (imgURL != null) {
 	        img = new ImageIcon(imgURL, "");
