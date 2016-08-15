@@ -66,21 +66,6 @@ public class AutoUpdater extends JDialog implements ActionListener {
 		this.setVisible(true);
 	}
 
-	/*
-	 * URL website = new URL(downloadUrl); ReadableByteChannel rbc =
-	 * Channels.newChannel(website.openStream()); File outputFile = new
-	 * File(".", name); FileOutputStream fos = new FileOutputStream(outputFile);
-	 * fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE); fos.close();
-	 */
-
-	/*
-	 * HttpClient httpclient = new DefaultHttpClient(); HttpGet httpget = new
-	 * HttpGet(urltofetch); HttpResponse response = httpclient.execute(httpget);
-	 * HttpEntity entity = response.getEntity(); if (entity != null) { long len
-	 * = entity.getContentLength(); InputStream inputStream =
-	 * entity.getContent(); // write the file to whether you want it. }
-	 */
-
 	private String[] checkForUpdate() {
 		HttpClientBuilder httpcb = HttpClientBuilder.create();
 
@@ -143,21 +128,6 @@ public class AutoUpdater extends JDialog implements ActionListener {
 		return version;
 	}
 
-	/*
-	 * URL website = new URL(downloadUrl); ReadableByteChannel rbc =
-	 * Channels.newChannel(website.openStream()); File outputFile = new
-	 * File(".", name); FileOutputStream fos = new FileOutputStream(outputFile);
-	 * fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE); fos.close();
-	 */
-
-	/*
-	 * HttpClient httpclient = new DefaultHttpClient(); HttpGet httpget = new
-	 * HttpGet(urltofetch); HttpResponse response = httpclient.execute(httpget);
-	 * HttpEntity entity = response.getEntity(); if (entity != null) { long len
-	 * = entity.getContentLength(); InputStream inputStream =
-	 * entity.getContent(); // write the file to whether you want it. }
-	 */
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource().equals(downloadButton)) {
@@ -174,7 +144,7 @@ public class AutoUpdater extends JDialog implements ActionListener {
 					long length = entity.getContentLength();
 					InputStream inputStream = entity.getContent();
 					// write the file to whether you want it.
-					File outputFile = new File(".", update[0]); 
+					File outputFile = new File(".", update[0]);
 					FileOutputStream fos = new FileOutputStream(outputFile);
 					byte[] buffer = new byte[1024];
 					long totalLen = 0;
@@ -184,14 +154,14 @@ public class AutoUpdater extends JDialog implements ActionListener {
 						totalLen += len;
 					}
 					fos.close();
-					
-					if(totalLen != length){
+
+					if (totalLen != length) {
 						// We missed part of the file!!! Uh oh!
 						outputFile.delete();
 						JOptionPane.showMessageDialog(this, "Error downloading file! Please try again!", "Download error", JOptionPane.ERROR_MESSAGE);
 						downloadButton.setText("Download version " + update[1]);
 						downloadButton.setEnabled(true);
-					}else{
+					} else {
 						// We got all of it
 						JOptionPane.showMessageDialog(this, "Download complete. \nSpeedyGrader will now restart to apply the update.");
 						String myJar = new File(AutoUpdater.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
@@ -206,7 +176,6 @@ public class AutoUpdater extends JDialog implements ActionListener {
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-
 		}
 	}
 

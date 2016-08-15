@@ -116,6 +116,4 @@ public class InstallDialog extends JDialog implements ActionListener {
 		}
 	}
 	
-	
-
 }
