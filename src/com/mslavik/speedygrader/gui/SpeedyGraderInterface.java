@@ -222,7 +222,7 @@ public class SpeedyGraderInterface extends JFrame implements ActionListener, Lis
 		}else if (ae.getSource().equals(aboutItem)){
 			new AboutDialog();
 		}else if (ae.getSource().equals(installItem)){
-			//TODO
+			new InstallDialog();
 		}else if (ae.getSource().equals(upgradeItem)){
 			new AutoUpdater();
 		}

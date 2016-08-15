@@ -30,7 +30,7 @@ import com.mslavik.speedygrader.utils.Utilities;
 @SuppressWarnings("serial")
 public class AutoUpdater extends JDialog implements ActionListener {
 
-	private static final String version = "2.0";
+	private static final String version = "3.0";
 
 	private JButton downloadButton;
 	private String[] update;
@@ -194,10 +194,8 @@ public class AutoUpdater extends JDialog implements ActionListener {
 					}else{
 						// We got all of it
 						JOptionPane.showMessageDialog(this, "Download complete. \nSpeedyGrader will now restart to apply the update.");
-						System.out.println(AutoUpdater.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 						String myJar = new File(AutoUpdater.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
 						Runtime.getRuntime().exec("java -jar " + update[0] + " -d " + myJar);
-						System.out.println(myJar);
 						this.dispose();
 						SpeedyGrader.getInstance().getGUI().dispose();
 						System.exit(0);

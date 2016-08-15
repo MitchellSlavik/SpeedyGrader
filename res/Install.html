@@ -1,0 +1,98 @@
+<html>
+	<div style="padding-left: 5px;">
+		<h1>Install Instructions</h1>
+		<div style="padding-left: 5px;">
+			<p>
+			This instruction manual is for using SpeedyGrader on a windows machine.<br>
+			All other operating systems are untested and I am leaving it up to you<br>
+			to figure it out if you choose to use this software on anything other<br>
+			than windows. >:D
+			</p>
+		</div>
+	</div>
+	<br>
+	<div style="padding-left: 5px;">
+		<h1>Java</h1>
+		<div style="padding-left: 5px;">
+		<p>
+		Before starting these steps make sure typing "javac -version" in a<br>
+		command prompt <b>does not</b> give any version information or doing<br>
+		this will be pointless.
+		</p>
+		<br>
+		<p>
+		You obviously already have the java JRE installed on your computer just<br>
+		to read this manual, but to use SpeedyGrader to grade java programs you<br>
+		must have the java JDK installed to your computer as well. You can find<br>
+		the link for the JDK at the bottom of this page. Just click on the <br>
+		"Java Platform (JDK)" and download/install it.
+		</p>
+		<br>
+		<p>
+		After it is installed, you must set your classpath on your computer to<br>
+		point to the newly installed JDK. To do this you navigate to your<br>
+		"Advanced System Settings", click "Environmental Variables...", then<br>
+		click "edit" with your System Variable "Path" selected. Now go find the<br>
+		path to the bin folder of the JDK (It should look something like <br>
+		"C:\Program Files\Java\jdk#.#.#_##\bin"). Append that path to your <br>
+		"Path" System Variable (Windows 7 and earlier, add a ';' before<br>
+		appending the JDK bin path).
+		</p>
+		<br>
+		<p>
+		If everything went OK then you should be able to open a command prompt,<br>
+		type "javac -version" and get version output. Congrats you are now<br>
+		set to go to use SpeedyGrader for grading java programs.<br> 
+		<b>SpeedyGrader will require a restart to work after following these steps.</b>
+		</p>
+		</div>
+	</div>
+	<br>
+	<div style="padding-left: 5px;">
+		<h1>C++</h1>
+		<div style="padding-left: 5px;">
+			<p>
+			Before starting these steps make sure typing "g++ --version" in a<br>
+			command prompt <b>does not</b> give any version information or doing<br>
+			this will be pointless.
+			</p>
+			<br>
+			<p>
+			To start grading C++ files with SpeedyGrader, you must first install<br>
+			MinGW. Download MinGW from the link at the bottom of this page. After<br>
+			opening the installer, click "Install". Make a note of the installation<br>
+			directory (Usually "C:\MinGW"), then click "Continue". Wait for the<br>
+			installations to finish downloading and installing.
+			</p>
+			<br>
+			<p>
+			After the MinGW installer finishes, it should open a new window that<br>
+			allows you the choose MinGW packages. Click the checkbox next the<br>
+			package that ends in "g++". Then go to the top and select<br>
+			"Installation > Apply changes". Another window will appear, hit<br>
+			"Apply". Wait for more downloads/installations to complete. After<br>
+			the installations are complete, close the "MinGW Installation Manager"<br>
+			window.
+			</p>
+			<br>
+			<p>
+			After it is installed, you must set your classpath on your computer to<br>
+			point to the newly installed MinGW bin. To do this you navigate to your<br>
+			"Advanced System Settings", click "Environmental Variables...", then<br>
+			click "edit" with your System Variable "Path" selected. Now go find the<br>
+			path that MinGW installed to and get the path of the bin folder <br>
+			(It should look something like "C:\MinGW\bin"). Append that path to your<br>
+			"Path" System Variable (Windows 7 and earlier, add a ';' before <br>
+			appending the MinGW bin path).
+			</p>
+			<br>
+			<p>
+			If everything went OK then you should be able to open a command prompt,<br>
+			type "g++ --version" and get version output. Congrats you are now set to<br>
+			go to use SpeedyGrader for grading C++ programs.<br>
+			<b>SpeedyGrader will require a restart to work after following these steps.</b>
+			</p>
+		</div>
+	</div>
+	<br>
+</html>
