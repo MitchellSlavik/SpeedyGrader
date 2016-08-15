@@ -84,7 +84,7 @@ public class AutoUpdater extends JDialog implements ActionListener {
 	private String[] checkForUpdate() {
 		HttpClientBuilder httpcb = HttpClientBuilder.create();
 
-		HttpGet httpget = new HttpGet("https://api.github.com/repos/MitchellSlavik/SpeedyGrader/contents/dist?ref=updating-test");
+		HttpGet httpget = new HttpGet("https://api.github.com/repos/MitchellSlavik/SpeedyGrader/contents/dist");
 
 		try {
 			HttpResponse response = httpcb.build().execute(httpget);
