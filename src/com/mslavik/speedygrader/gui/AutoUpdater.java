@@ -30,7 +30,7 @@ import com.mslavik.speedygrader.utils.Utilities;
 @SuppressWarnings("serial")
 public class AutoUpdater extends JDialog implements ActionListener {
 
-	private static final String version = "3.0";
+	private static final String version = "3.1";
 
 	private JButton downloadButton;
 	private String[] update;
