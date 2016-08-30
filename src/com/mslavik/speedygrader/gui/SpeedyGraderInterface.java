@@ -41,7 +41,7 @@ public class SpeedyGraderInterface extends JFrame implements ActionListener, Lis
 
 	private JMenuBar menuBar;
 	private JMenuItem openItem, inputItem, saveItem, refreshItem, aboutItem, githubItem, upgradeItem, installItem;
-	private JCheckBoxMenuItem timeoutPrograms;
+	private JCheckBoxMenuItem timeoutPrograms, editorSplitToggle;
 	private JList<SourceFile> filesList;
 	private DefaultListModel<SourceFile> filesListModel;
 	private JSplitPane splitMainPane;
@@ -111,6 +111,13 @@ public class SpeedyGraderInterface extends JFrame implements ActionListener, Lis
 		timeoutPrograms.setFont(textFont);
 		timeoutPrograms.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, ActionEvent.CTRL_MASK));
 		optionsMenu.add(timeoutPrograms);
+		
+		editorSplitToggle = new JCheckBoxMenuItem("Split editor/console vertically");
+		editorSplitToggle.setSelected(true);
+		editorSplitToggle.setFont(textFont);
+		editorSplitToggle.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK | ActionEvent.ALT_MASK));
+		editorSplitToggle.addActionListener(this);
+		optionsMenu.add(editorSplitToggle);
 		
 		JMenu helpMenu = new JMenu("  Help  ");
 		helpMenu.setMnemonic(KeyEvent.VK_H);
@@ -225,6 +232,10 @@ public class SpeedyGraderInterface extends JFrame implements ActionListener, Lis
 			new InstallDialog();
 		}else if (ae.getSource().equals(upgradeItem)){
 			new AutoUpdater();
+		}else if (ae.getSource().equals(editorSplitToggle)){
+			splitEditorPane.setOrientation(editorSplitToggle.isSelected() ? JSplitPane.VERTICAL_SPLIT : JSplitPane.HORIZONTAL_SPLIT);
+			this.validate();
+			this.repaint();
 		}
 	}
 
